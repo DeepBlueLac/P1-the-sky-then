@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Head from 'expo-router/head';
 import { Download, MapPin, Search, Sparkles } from 'lucide-react-native';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -141,7 +142,13 @@ export default function PosterStudio() {
   };
 
   return (
-    <SafeAreaView style={styles.page}>
+    <>
+      <Head>
+        <title>此刻星空 · 真实星图纪念海报</title>
+        <meta name="description" content="输入日期、当地时间和地点，生成那一刻真实可见的星空纪念海报。" />
+        <link rel="canonical" href="https://the-sky-then.vercel.app" />
+      </Head>
+      <SafeAreaView style={styles.page}>
       <ScrollView contentContainerStyle={styles.pageContent} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <View style={styles.brandMark}><Sparkles size={18} color="#ffffff" strokeWidth={1.8} /></View>
@@ -270,7 +277,8 @@ export default function PosterStudio() {
           <Text style={styles.footerText}>输入仅保存在此设备</Text>
         </View>
       </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </>
   );
 }
 
