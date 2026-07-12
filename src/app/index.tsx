@@ -91,6 +91,10 @@ export default function PosterStudio() {
   }, []);
 
   useEffect(() => {
+    if (Platform.OS === 'web') document.title = '此刻星空 · 真实星图纪念海报';
+  }, []);
+
+  useEffect(() => {
     if (hydrated) AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state)).catch(() => undefined);
   }, [hydrated, state]);
 
