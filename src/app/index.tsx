@@ -150,7 +150,7 @@ export default function PosterStudio() {
       <Head>
         <title>此刻星空 · 真实星图纪念海报</title>
         <meta name="description" content="输入日期、当地时间和地点，生成那一刻真实可见的星空纪念海报。" />
-        <link rel="canonical" href="https://the-sky-then.vercel.app" />
+        <link rel="canonical" href="https://the-sky-then-live.vercel.app" />
       </Head>
       <SafeAreaView style={styles.page}>
       <ScrollView contentContainerStyle={styles.pageContent} keyboardShouldPersistTaps="handled">
