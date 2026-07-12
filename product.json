@@ -1,0 +1,17 @@
+﻿{
+    "slug":  "the-sky-then",
+    "name":  "此刻星空",
+    "mode":  "light-api",
+    "status":  "building",
+    "platforms":  [
+                      "web",
+                      "ios",
+                      "android"
+                  ],
+    "path":  "C:\\Users\\Administrator\\Documents\\变成一个网站并部署\\products\\the-sky-then",
+    "github":  null,
+    "webUrl":  null,
+    "bundleId":  "com.deepbluelac.theskythen",
+    "createdAt":  "2026-07-12T11:35:51.9047248Z",
+    "updatedAt":  "2026-07-12T11:35:51.9047248Z"
+}
