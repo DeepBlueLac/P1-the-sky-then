@@ -31,6 +31,7 @@ body {
 
   [data-testid="controls"] {
     width: 410px !important;
+    order: 1 !important;
     padding-right: 28px !important;
     border-right: 1px solid #d9ddda !important;
   }
@@ -38,8 +39,30 @@ body {
   [data-testid="preview-area"] {
     flex: 1 1 0% !important;
     width: auto !important;
+    order: 2 !important;
     padding: 22px 0 0 34px !important;
     position: sticky !important;
     top: 0 !important;
+  }
+
+  [data-testid="mobile-edit"] {
+    display: none !important;
+  }
+}
+
+@media (max-width: 979px) {
+  [data-testid="toolbar-download"] {
+    width: 42px !important;
+    min-width: 42px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  [data-testid="toolbar-download-label"] {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    overflow: hidden !important;
   }
 }

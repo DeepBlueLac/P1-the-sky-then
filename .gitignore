@@ -8,6 +8,7 @@ dist-android/
 .expo/
 test-results/
 playwright-report/
+.ralph/
 
 # Expo
 .expo/
