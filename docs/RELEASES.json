@@ -7,5 +7,14 @@
     "iosBuild": null,
     "androidBuild": null,
     "releasedAt": "2026-07-12T16:01:00.000Z"
+  },
+  {
+    "version": "0.1.1",
+    "commit": "227af88",
+    "webUrl": "https://the-sky-then-live.vercel.app",
+    "vercelDeployment": "dpl_7zZrL2hTpsMgPqk5jg79KocZ37r2",
+    "iosBuild": null,
+    "androidBuild": null,
+    "releasedAt": "2026-07-13T20:17:13.930Z"
   }
 ]
