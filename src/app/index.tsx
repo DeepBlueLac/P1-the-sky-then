@@ -26,6 +26,18 @@ import { trackProductEvent } from '@/services/analytics';
 import { searchLocations } from '@/services/geocoding';
 
 const STORAGE_KEY = 'the-sky-then:poster:v1';
+const STAR_VIDEO_URL = 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260315_073750_51473149-4350-4920-ae24-c8214286f323.mp4';
+const WebVideo = 'video' as unknown as React.ComponentType<{
+  autoPlay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  playsInline?: boolean;
+  preload?: string;
+  src: string;
+  style?: Record<string, unknown>;
+  'aria-hidden'?: boolean;
+  'data-testid'?: string;
+}>;
 const DEFAULT_LOCATION: LocationResult = {
   id: 'shanghai-cn',
   name: 'Shanghai',
@@ -211,9 +223,23 @@ export default function PosterStudio() {
         <meta name="description" content="输入日期、当地时间和地点，生成那一刻真实可见的星空纪念海报。" />
         <link rel="canonical" href="https://the-sky-then-live.vercel.app" />
       </Head>
-      <SafeAreaView style={styles.page}>
+      <SafeAreaView testID="app-shell" style={styles.page}>
+      {Platform.OS === 'web' ? (
+        <WebVideo
+          data-testid="sky-video"
+          aria-hidden
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          src={STAR_VIDEO_URL}
+          style={styles.videoBackground as never}
+        />
+      ) : <View pointerEvents="none" style={styles.nativeBackdrop} />}
+      <View pointerEvents="none" style={styles.videoVeil} />
       <ScrollView ref={scrollRef} contentContainerStyle={styles.pageContent} keyboardShouldPersistTaps="handled">
-        <View style={styles.header}>
+        <View testID="glass-header" style={styles.header}>
           <View style={styles.brandMark}><Sparkles size={18} color="#ffffff" strokeWidth={1.8} /></View>
           <View>
             <Text style={styles.brand}>此刻星空</Text>
@@ -451,96 +477,99 @@ function Toggle({ label, value, onValueChange }: { label: string; value: boolean
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#f1f3f0' },
+  page: { flex: 1, backgroundColor: '#070914' },
+  videoBackground: { position: 'fixed', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: -2, pointerEvents: 'none' } as never,
+  nativeBackdrop: { ...StyleSheet.absoluteFill, backgroundColor: '#070914', zIndex: -2 },
+  videoVeil: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(4, 7, 18, 0.56)', zIndex: -1 },
   srOnly: { position: 'absolute', width: 1, height: 1, opacity: 0 },
-  pageContent: { minHeight: '100%', paddingHorizontal: 16, paddingBottom: 28 },
-  header: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: '#d9ddda', maxWidth: 1440, width: '100%', alignSelf: 'center' },
-  brandMark: { width: 34, height: 34, backgroundColor: '#101820', alignItems: 'center', justifyContent: 'center', borderRadius: 4 },
-  brand: { fontSize: 17, fontWeight: '700', color: '#171a18' },
-  brandEnglish: { fontSize: 9, color: '#6e7470', fontWeight: '700' },
-  headerRule: { width: 1, height: 26, backgroundColor: '#d4d8d5', marginLeft: 4 },
-  headerMeta: { color: '#6d736f', fontSize: 12, flexShrink: 1 },
+  pageContent: { minHeight: '100%', paddingHorizontal: 16, paddingBottom: 28, position: 'relative' },
+  header: { minHeight: 68, flexDirection: 'row', alignItems: 'center', gap: 12, maxWidth: 1440, width: '100%', alignSelf: 'center', marginTop: 10, paddingHorizontal: 16, backgroundColor: 'rgba(8, 12, 28, 0.38)', borderRadius: 16 },
+  brandMark: { width: 34, height: 34, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center', borderRadius: 17 },
+  brand: { fontSize: 17, fontWeight: '700', color: '#ffffff' },
+  brandEnglish: { fontSize: 9, color: 'rgba(255,255,255,0.62)', fontWeight: '700', letterSpacing: 1.2 },
+  headerRule: { width: 1, height: 26, backgroundColor: 'rgba(255,255,255,0.2)', marginLeft: 4 },
+  headerMeta: { color: 'rgba(255,255,255,0.72)', fontSize: 12, flexShrink: 1 },
   workspace: { width: '100%', maxWidth: 1440, alignSelf: 'center' },
   workspaceWide: { flexDirection: 'row', alignItems: 'flex-start' },
   controls: { width: '100%', order: 2 } as never,
-  controlsWide: { width: 410, order: 1, borderRightWidth: 1, borderRightColor: '#d9ddda', paddingRight: 28 } as never,
-  utilityRow: { minHeight: 68, flexDirection: 'row', alignItems: 'center', gap: 12, borderBottomWidth: 1, borderBottomColor: '#d9ddda' },
+  controlsWide: { width: '52%', order: 1, paddingRight: 28 } as never,
+  utilityRow: { minHeight: 68, flexDirection: 'row', alignItems: 'center', gap: 12 },
   utilityCopy: { flex: 1, gap: 3 },
-  utilityTitle: { color: '#27302c', fontSize: 12, fontWeight: '700' },
-  utilityText: { color: '#747b76', fontSize: 10, lineHeight: 15 },
-  secondaryIconButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#cbd1cd', borderRadius: 5, backgroundColor: '#ffffff' },
-  resetConfirm: { paddingVertical: 12, gap: 10, borderBottomWidth: 1, borderBottomColor: '#d9ddda' },
-  resetText: { color: '#6b3c36', fontSize: 12 },
+  utilityTitle: { color: '#ffffff', fontSize: 12, fontWeight: '700' },
+  utilityText: { color: 'rgba(255,255,255,0.6)', fontSize: 10, lineHeight: 15 },
+  secondaryIconButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.1)' },
+  resetConfirm: { paddingVertical: 12, gap: 10 },
+  resetText: { color: '#ffc9c4', fontSize: 12 },
   confirmActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8 },
   textButton: { minHeight: 38, paddingHorizontal: 12, alignItems: 'center', justifyContent: 'center' },
-  textButtonLabel: { color: '#626a65', fontSize: 12, fontWeight: '700' },
-  confirmButton: { minHeight: 38, paddingHorizontal: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: '#101820', borderRadius: 5 },
+  textButtonLabel: { color: 'rgba(255,255,255,0.72)', fontSize: 12, fontWeight: '700' },
+  confirmButton: { minHeight: 38, paddingHorizontal: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 19 },
   confirmButtonLabel: { color: '#ffffff', fontSize: 12, fontWeight: '700' },
-  section: { paddingVertical: 22, borderBottomWidth: 1, borderBottomColor: '#d9ddda', gap: 12 },
+  section: { paddingVertical: 22, gap: 12 },
   sectionHeading: { flexDirection: 'row', alignItems: 'baseline', gap: 10 },
-  sectionNumber: { color: '#1f49c6', fontSize: 10, fontWeight: '800' },
-  sectionTitle: { color: '#171a18', fontSize: 16, fontWeight: '700' },
+  sectionNumber: { color: 'rgba(255,255,255,0.54)', fontSize: 10, fontWeight: '800' },
+  sectionTitle: { color: '#ffffff', fontSize: 16, fontWeight: '700' },
   row: { flexDirection: 'row', gap: 10 },
   field: { flex: 1, gap: 6 },
   fieldFull: { width: '100%' },
-  label: { fontSize: 11, fontWeight: '700', color: '#636966' },
-  input: { height: 42, borderWidth: 1, borderColor: '#cfd4d1', borderRadius: 5, backgroundColor: '#ffffff', paddingHorizontal: 12, fontSize: 14, color: '#171a18' },
-  inputError: { borderColor: '#b94f45', backgroundColor: '#fffafa' },
-  fieldError: { color: '#a13f37', fontSize: 10, lineHeight: 14 },
+  label: { fontSize: 11, fontWeight: '700', color: 'rgba(255,255,255,0.62)' },
+  input: { height: 42, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 12, fontSize: 14, color: '#ffffff' },
+  inputError: { backgroundColor: 'rgba(180,50,50,0.25)' },
+  fieldError: { color: '#ffb5ae', fontSize: 10, lineHeight: 14 },
   searchRow: { flexDirection: 'row', gap: 8 },
-  searchInputWrap: { height: 42, flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1, borderColor: '#cfd4d1', borderRadius: 5, backgroundColor: '#fff', paddingHorizontal: 11 },
-  searchInput: { flex: 1, color: '#171a18', fontSize: 14, height: 40 },
-  iconButton: { width: 42, height: 42, backgroundColor: '#101820', borderRadius: 5, alignItems: 'center', justifyContent: 'center' },
+  searchInputWrap: { height: 42, flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 14 },
+  searchInput: { flex: 1, color: '#ffffff', fontSize: 14, height: 40 },
+  iconButton: { width: 42, height: 42, backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 21, alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: 0.72 },
   disabled: { opacity: 0.45 },
-  error: { color: '#a62d36', fontSize: 12 },
-  results: { borderWidth: 1, borderColor: '#d1d5d2', backgroundColor: '#fff', borderRadius: 5, overflow: 'hidden' },
-  resultRow: { paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#d6dad7' },
-  resultPressed: { backgroundColor: '#eef1ef' },
-  resultName: { color: '#171a18', fontWeight: '700', fontSize: 13 },
-  resultMeta: { color: '#747a76', fontSize: 11, marginTop: 2 },
-  selectedLocation: { color: '#737975', fontSize: 11 },
+  error: { color: '#ffb5ae', fontSize: 12 },
+  results: { backgroundColor: 'rgba(6,9,22,0.82)', borderRadius: 12, overflow: 'hidden' },
+  resultRow: { paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: 'rgba(255,255,255,0.12)' },
+  resultPressed: { backgroundColor: 'rgba(255,255,255,0.1)' },
+  resultName: { color: '#ffffff', fontWeight: '700', fontSize: 13 },
+  resultMeta: { color: 'rgba(255,255,255,0.58)', fontSize: 11, marginTop: 2 },
+  selectedLocation: { color: 'rgba(255,255,255,0.58)', fontSize: 11 },
   themeRow: { gap: 7 },
-  themeButton: { height: 38, flexDirection: 'row', alignItems: 'center', gap: 9, borderWidth: 1, borderColor: '#d0d5d1', borderRadius: 5, paddingHorizontal: 10, backgroundColor: '#fff' },
-  selectedControl: { borderColor: '#1f49c6', backgroundColor: '#eef2ff' },
-  swatch: { width: 17, height: 17, borderRadius: 3, borderWidth: StyleSheet.hairlineWidth, borderColor: '#9ca19e' },
-  controlText: { color: '#262a27', fontSize: 12, fontWeight: '600' },
-  segmented: { flexDirection: 'row', padding: 3, backgroundColor: '#e5e8e6', borderRadius: 6 },
-  segment: { flex: 1, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 4 },
-  segmentActive: { backgroundColor: '#fff' },
-  segmentText: { color: '#6a706c', fontSize: 12, fontWeight: '600' },
-  segmentTextActive: { color: '#171a18' },
-  toggleRow: { height: 38, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: '#d7dbd8' },
-  toggleLabel: { color: '#303431', fontSize: 13 },
+  themeButton: { height: 38, flexDirection: 'row', alignItems: 'center', gap: 9, borderRadius: 12, paddingHorizontal: 10, backgroundColor: 'rgba(255,255,255,0.06)' },
+  selectedControl: { backgroundColor: 'rgba(255,255,255,0.18)' },
+  swatch: { width: 17, height: 17, borderRadius: 9 },
+  controlText: { color: 'rgba(255,255,255,0.88)', fontSize: 12, fontWeight: '600' },
+  segmented: { flexDirection: 'row', padding: 3, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 16 },
+  segment: { flex: 1, height: 32, alignItems: 'center', justifyContent: 'center', borderRadius: 14 },
+  segmentActive: { backgroundColor: 'rgba(255,255,255,0.18)' },
+  segmentText: { color: 'rgba(255,255,255,0.58)', fontSize: 12, fontWeight: '600' },
+  segmentTextActive: { color: '#ffffff' },
+  toggleRow: { height: 38, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: 'rgba(255,255,255,0.12)' },
+  toggleLabel: { color: 'rgba(255,255,255,0.86)', fontSize: 13 },
   offerRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
-  offerIcon: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 4, backgroundColor: '#e8f0eb' },
-  premiumIcon: { backgroundColor: '#f8e9e5' },
+  offerIcon: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 15, backgroundColor: 'rgba(116, 234, 179, 0.15)' },
+  premiumIcon: { backgroundColor: 'rgba(255, 202, 186, 0.16)' },
   offerCopy: { flex: 1, gap: 4 },
-  offerTitle: { color: '#202824', fontSize: 13, fontWeight: '800' },
-  offerText: { color: '#69716c', fontSize: 11, lineHeight: 17 },
+  offerTitle: { color: '#ffffff', fontSize: 13, fontWeight: '800' },
+  offerText: { color: 'rgba(255,255,255,0.6)', fontSize: 11, lineHeight: 17 },
   priceRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', gap: 8 },
-  price: { color: '#a04438', fontSize: 12, fontWeight: '800' },
-  freeDownloadButton: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#101820', borderRadius: 5 },
+  price: { color: '#ffd0c8', fontSize: 12, fontWeight: '800' },
+  freeDownloadButton: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 22 },
   freeDownloadText: { color: '#ffffff', fontSize: 12, fontWeight: '800' },
-  premiumRule: { height: 1, backgroundColor: '#d9ddda', marginVertical: 2 },
-  intentButton: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderWidth: 1, borderColor: '#c96759', borderRadius: 5, backgroundColor: '#fff8f6' },
-  intentButtonText: { color: '#8f3b31', fontSize: 12, fontWeight: '800' },
-  intentMessage: { color: '#2e6d55', fontSize: 11, lineHeight: 16 },
+  premiumRule: { height: 1, backgroundColor: 'rgba(255,255,255,0.14)', marginVertical: 2 },
+  intentButton: { minHeight: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.06)' },
+  intentButtonText: { color: '#ffd0c8', fontSize: 12, fontWeight: '800' },
+  intentMessage: { color: '#c3ffd9', fontSize: 11, lineHeight: 16 },
   previewArea: { paddingTop: 16, paddingBottom: 12, width: '100%', order: 1 } as never,
-  previewAreaWide: { flex: 1, order: 2, paddingLeft: 34, paddingTop: 22, position: 'sticky', top: 0 } as never,
+  previewAreaWide: { width: '48%', order: 2, paddingLeft: 34, paddingTop: 22, position: 'sticky', top: 0 } as never,
   previewToolbar: { minHeight: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
-  previewLabel: { fontSize: 10, fontWeight: '800', color: '#1f49c6' },
-  previewStatus: { color: '#6e7470', fontSize: 12, marginTop: 3 },
-  toolbarIconButton: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#cbd1cd', borderRadius: 5, backgroundColor: '#ffffff' },
+  previewLabel: { fontSize: 10, fontWeight: '800', color: 'rgba(255,255,255,0.56)', letterSpacing: 1.5 },
+  previewStatus: { color: 'rgba(255,255,255,0.78)', fontSize: 12, marginTop: 3 },
+  toolbarIconButton: { width: 42, height: 42, alignItems: 'center', justifyContent: 'center', borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.1)' },
   hideOnWide: { display: 'none' },
   toolbarIconButtonDark: { minWidth: 42, width: 42, paddingHorizontal: 0 },
-  downloadButton: { minWidth: 136, height: 42, paddingHorizontal: 15, flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: '#101820', borderRadius: 5 },
+  downloadButton: { minWidth: 136, height: 42, paddingHorizontal: 15, flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 21 },
   downloadText: { color: '#fff', fontWeight: '700', fontSize: 12 },
   posterStage: { width: '100%', minHeight: 420, alignItems: 'center', justifyContent: 'flex-start' },
-  invalidPoster: { width: '100%', height: 420, borderWidth: 1, borderColor: '#d4d8d5', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, gap: 8 },
-  invalidTitle: { color: '#8f3b31', fontSize: 16, fontWeight: '800', textAlign: 'center' },
-  invalidText: { color: '#737975', fontSize: 12, lineHeight: 18, textAlign: 'center' },
-  exportMessage: { textAlign: 'center', marginTop: 10, color: '#4f5652', fontSize: 12 },
-  footer: { width: '100%', maxWidth: 1440, alignSelf: 'center', paddingTop: 20, marginTop: 24, borderTopWidth: 1, borderTopColor: '#d9ddda', flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
-  footerText: { color: '#7d837f', fontSize: 10 },
+  invalidPoster: { width: '100%', height: 420, backgroundColor: 'rgba(6,9,22,0.55)', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, gap: 8, borderRadius: 24 },
+  invalidTitle: { color: '#ffc9c4', fontSize: 16, fontWeight: '800', textAlign: 'center' },
+  invalidText: { color: 'rgba(255,255,255,0.62)', fontSize: 12, lineHeight: 18, textAlign: 'center' },
+  exportMessage: { textAlign: 'center', marginTop: 10, color: 'rgba(255,255,255,0.82)', fontSize: 12 },
+  footer: { width: '100%', maxWidth: 1440, alignSelf: 'center', paddingTop: 20, marginTop: 24, flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
+  footerText: { color: 'rgba(255,255,255,0.5)', fontSize: 10 },
 });

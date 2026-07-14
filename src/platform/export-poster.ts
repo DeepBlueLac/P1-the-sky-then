@@ -8,7 +8,9 @@ export async function exportPoster(ref: RefObject<View | null>, fileName: string
   if (!ref.current) throw new Error('Poster is not ready');
   if (Platform.OS === 'web') {
     const { toPng } = await import('html-to-image');
-    const dataUrl = await toPng(ref.current as unknown as HTMLElement, { pixelRatio: 3, cacheBust: true });
+    // The poster itself is SVG. Skip document font harvesting so a cross-origin
+    // presentation font can never block the user's local PNG export.
+    const dataUrl = await toPng(ref.current as unknown as HTMLElement, { pixelRatio: 3, cacheBust: true, fontEmbedCSS: '' });
     const anchor = document.createElement('a');
     anchor.download = `${fileName}.png`;
     anchor.href = dataUrl;

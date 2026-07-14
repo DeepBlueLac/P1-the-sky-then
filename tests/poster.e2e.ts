@@ -1,3 +1,4 @@
+import { statSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 
 for (const viewport of [
@@ -11,6 +12,10 @@ for (const viewport of [
     await page.setViewportSize(viewport);
     await page.goto('/');
     await expect(page.getByTestId('app-ready')).toBeAttached();
+    const skyVideo = page.getByTestId('sky-video');
+    await expect(skyVideo).toBeAttached();
+    await expect(skyVideo).toHaveAttribute('src', /hf_20260315_073750/);
+    expect(await skyVideo.evaluate((element: HTMLVideoElement) => element.muted && element.loop && element.autoplay)).toBe(true);
     await expect(page.getByText('此刻星空', { exact: true })).toBeVisible();
     await expect(page.getByText(/颗可见恒星/)).toBeVisible();
     await expect(page.locator('svg').first()).toBeVisible();
@@ -21,6 +26,8 @@ for (const viewport of [
       const controls = await page.getByTestId('controls').boundingBox();
       const preview = await page.getByTestId('preview-area').boundingBox();
       expect(controls?.x ?? 9999).toBeLessThan(preview?.x ?? 0);
+      expect((controls?.width ?? 0) / ((controls?.width ?? 0) + (preview?.width ?? 0))).toBeGreaterThan(.5);
+      expect(await page.getByTestId('controls').evaluate((element) => getComputedStyle(element, '::before').content)).not.toBe('none');
       await expect(page.getByTestId('mobile-edit')).toBeHidden();
     } else {
       const controls = await page.getByTestId('controls').boundingBox();
@@ -44,6 +51,7 @@ test('theme selection updates the poster and PNG export works', async ({ page })
   await page.getByText('下载 PNG', { exact: true }).click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/^the-sky-then-.*\.png$/);
+  expect(statSync((await download.path())!).size).toBeGreaterThan(1_000);
 });
 
 test('invalid date shows a recoverable error and disables export', async ({ page }) => {
@@ -83,6 +91,7 @@ test('location search selects a validated result', async ({ page }) => {
   await page.getByLabel('搜索地点').click();
   await page.getByLabel('选择 Paris').click();
   await expect(page.getByText(/Paris · 48\.85°.*Europe\/Paris/)).toBeVisible();
+  await page.screenshot({ path: 'test-results/paris-selected.png', fullPage: true });
 });
 
 test('premium interest is explicit and never implies a charge', async ({ page }) => {
