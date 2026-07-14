@@ -66,7 +66,8 @@
     "check": "npm run lint && npm run typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "pretest:e2e": "npm run web:export",
+    "test:e2e": "node scripts/run-e2e.mjs"
   },
   "private": true
 }
