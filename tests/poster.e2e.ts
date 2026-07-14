@@ -28,6 +28,21 @@ test('entering the sky changes to the exploration state', async ({ page }) => {
   await expect(page.getByRole('button', { name: '退出观星' })).toBeVisible();
   await expect(page.getByLabel(/真实可见星空/)).toBeVisible();
   await expect(page.getByText('星座线')).toBeVisible();
+  await expect(page.getByLabel('时间轴')).toBeVisible();
+  await page.getByLabel('时间轴').fill('1320');
+  await expect(page.getByText(/上海 · 2024\.05\.20 · 22:00/)).toBeVisible();
+  await page.getByRole('button', { name: '回到这一刻' }).click();
+  await expect(page.getByText(/上海 · 2024\.05\.20 · 20:30/)).toBeVisible();
+});
+
+test('artwork mode is a dedicated editable surface', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: '作品模式' }).click();
+  await expect(page.getByRole('region', { name: '作品模式' })).toBeVisible();
+  await expect(page.getByLabel('可导出的星空作品')).toBeVisible();
+  await expect(page.getByRole('button', { name: '下载 PNG' })).toBeVisible();
+  await page.getByRole('button', { name: '返回观星' }).click();
+  await expect(page.getByRole('heading', { name: /让真实星位/ })).toBeVisible();
 });
 
 test('location search selects an API-normalized place', async ({ page }) => {

@@ -7,9 +7,9 @@ import starData from '@/data/stars.6.json';
 import type { ProjectedLabel, ProjectedLine, ProjectedStar, SkyInput, SkyMap } from '@/core/types';
 
 type Coordinate = [number, number];
-type StarFeature = { properties: { mag: number }; geometry: { coordinates: Coordinate } };
-type LineFeature = { geometry: { coordinates: Coordinate[][] } };
-type LabelFeature = { properties: { desig: string; rank?: string | number }; geometry: { coordinates: Coordinate } };
+type StarFeature = { id: string | number; properties: { mag: number }; geometry: { coordinates: Coordinate } };
+type LineFeature = { id: string; geometry: { coordinates: Coordinate[][] } };
+type LabelFeature = { id: string; properties: { desig: string; rank?: string | number }; geometry: { coordinates: Coordinate } };
 
 const stars = (starData as unknown as { features: StarFeature[] }).features.filter((star) => Number(star.properties.mag) <= 5.5);
 const constellationLines = (constellationLineData as unknown as { features: LineFeature[] }).features;
@@ -19,14 +19,14 @@ function projectCoordinate(
   coordinate: Coordinate,
   time: Date,
   rotation: Astronomy.RotationMatrix,
-): { x: number; y: number; altitude: number } {
+): { x: number; y: number; altitude: number; azimuth: number } {
   const [rightAscensionDegrees, declination] = coordinate;
   const vector = Astronomy.VectorFromSphere(new Astronomy.Spherical(declination, rightAscensionDegrees, 1), time);
   const horizontalVector = Astronomy.RotateVector(rotation, vector);
   const horizon = Astronomy.HorizonFromVector(horizontalVector, 'normal');
   const radius = (90 - horizon.lat) / 90;
   const azimuth = (horizon.lon * Math.PI) / 180;
-  return { x: radius * Math.sin(azimuth), y: -radius * Math.cos(azimuth), altitude: horizon.lat };
+  return { x: radius * Math.sin(azimuth), y: -radius * Math.cos(azimuth), altitude: horizon.lat, azimuth: horizon.lon };
 }
 
 export function projectEquatorialCoordinate(coordinate: Coordinate, input: SkyInput) {
@@ -51,10 +51,14 @@ export function buildSkyMap(input: SkyInput): SkyMap {
     const point = projectCoordinate(star.geometry.coordinates, utcDate, rotation);
     if (point.altitude >= 0) {
       projectedStars.push({
+        id: `hip-${star.id}`,
         x: point.x,
         y: point.y,
+        altitude: point.altitude,
+        azimuth: point.azimuth,
         magnitude: Number(star.properties.mag),
         opacity: Math.max(0.3, Math.min(1, point.altitude / 18)),
+        twinkleSeed: Number(star.id) % 997,
       });
     }
   }
@@ -66,7 +70,7 @@ export function buildSkyMap(input: SkyInput): SkyMap {
         const start = projectCoordinate(line[index - 1], utcDate, rotation);
         const end = projectCoordinate(line[index], utcDate, rotation);
         if (start.altitude >= 0 && end.altitude >= 0) {
-          projectedLines.push({ x1: start.x, y1: start.y, x2: end.x, y2: end.y });
+          projectedLines.push({ x1: start.x, y1: start.y, x2: end.x, y2: end.y, constellationId: feature.id });
         }
       }
     }
@@ -76,7 +80,7 @@ export function buildSkyMap(input: SkyInput): SkyMap {
   for (const feature of constellationLabels) {
     const point = projectCoordinate(feature.geometry.coordinates, utcDate, rotation);
     if (point.altitude >= 8) {
-      projectedLabels.push({ x: point.x, y: point.y, text: feature.properties.desig, rank: Number(feature.properties.rank ?? 3) });
+      projectedLabels.push({ x: point.x, y: point.y, text: feature.properties.desig, rank: Number(feature.properties.rank ?? 3), constellationId: feature.id });
     }
   }
 

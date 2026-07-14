@@ -19,9 +19,18 @@ export type SkyInput = {
   timezone: string;
 };
 
-export type ProjectedStar = { x: number; y: number; magnitude: number; opacity: number };
-export type ProjectedLine = { x1: number; y1: number; x2: number; y2: number };
-export type ProjectedLabel = { x: number; y: number; text: string; rank: number };
+export type ProjectedStar = {
+  id: string;
+  x: number;
+  y: number;
+  altitude: number;
+  azimuth: number;
+  magnitude: number;
+  opacity: number;
+  twinkleSeed: number;
+};
+export type ProjectedLine = { x1: number; y1: number; x2: number; y2: number; constellationId: string };
+export type ProjectedLabel = { x: number; y: number; text: string; rank: number; constellationId: string };
 
 export type SkyMap = {
   utcDate: Date;
