@@ -1,4 +1,3 @@
-import { Platform } from 'react-native';
 import { z } from 'zod';
 
 import type { LocationResult } from '@/core/types';
@@ -30,11 +29,11 @@ async function request(url: string) {
 }
 
 export async function searchLocations(query: string): Promise<LocationResult[]> {
-  const apiBase = process.env.EXPO_PUBLIC_API_BASE_URL?.replace(/\/$/, '');
-  const localEndpoint = apiBase ? `${apiBase}/api/geocode?q=${encodeURIComponent(query)}` : `/api/geocode?q=${encodeURIComponent(query)}`;
+  const apiBase = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '');
+  const localEndpoint = `${apiBase ?? ''}/api/geocode?q=${encodeURIComponent(query)}`;
   let data;
   try {
-    data = Platform.OS === 'web' ? await request(localEndpoint) : await request(apiBase ? localEndpoint : upstream(query));
+    data = await request(localEndpoint);
   } catch {
     data = await request(upstream(query));
   }
