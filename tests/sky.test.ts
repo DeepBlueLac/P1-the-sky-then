@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildSkyMap, projectEquatorialCoordinate } from '../src/core/sky';
+import { buildSkyMap, estimateSpectralClass, estimateStellarTemperature, projectEquatorialCoordinate } from '../src/core/sky';
 
 const shanghai = {
   date: '2024-05-20',
@@ -37,5 +37,13 @@ describe('sky projection', () => {
 
   it('rejects malformed local dates', () => {
     expect(() => buildSkyMap({ ...shanghai, date: 'May 20' })).toThrow('Invalid local date or time');
+  });
+
+  it('derives honest temperature and spectral estimates from B−V color index', () => {
+    const solarTemperature = estimateStellarTemperature(0.65);
+    expect(solarTemperature).toBeGreaterThan(5600);
+    expect(solarTemperature).toBeLessThan(5900);
+    expect(estimateSpectralClass(solarTemperature)).toBe('G');
+    expect(estimateStellarTemperature(null)).toBeNull();
   });
 });

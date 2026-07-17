@@ -1,28 +1,58 @@
-# 设计 QA
+# 此刻星空 GPU 重构设计 QA
 
-- 源设计依据：已确认的 [`PRD.md`](PRD.md) 及 `D:\Ai-Project\Obsidian\DBL_obsidian\会话上下文\设计prompt.md`（视频、52/48 分栏、液态玻璃、字体、动效约束）。本次未提供独立的 Figma 或像素级视觉稿，因此以下为按已确认规格的实现验收，而非像素级还原比较。
-- 实现截图：[`docs/design-audit/01-desktop-editor.png`](docs/design-audit/01-desktop-editor.png)、[`docs/design-audit/02-mobile-preview-first.png`](docs/design-audit/02-mobile-preview-first.png)、[`docs/design-audit/03-paris-selected.png`](docs/design-audit/03-paris-selected.png)。
-- 视口与状态：1440×900 默认桌面、390×844 默认移动端、1440×900 Paris 已选择。
+日期：2026-07-18
+结果：通过，无未处理 P0 / P1 / P2。
 
-## 验收结果
+## 设计依据与证据
 
-- 字体与层级：Poppins 与中文后备字体用于界面；海报内容保留自身 SVG 字体语义。标题、标签与辅助文本层级清晰。
-- 布局与节奏：桌面编辑器与预览约为 52/48；移动端先显示海报，再进入编辑区；自动化已验证没有横向溢出。
-- 色彩与令牌：深空背景、白色文字层级、两级液态玻璃、`1rem` 圆角令牌落实；星图保留原有语义色。
-- 图像与资源：远程视频以 `muted / loop / playsInline` 背景加载；不可用时为深色背景。海报仍为可导出的真实 SVG 星图。
-- 文案与交互：真实地点查询、错误恢复、免费 PNG 下载和付费意向说明均已保留；焦点、hover、active 和减少动态效果路径存在。
+- 已确认设计依据：[`PRD.md`](PRD.md)、[`docs/WEB-REDESIGN-SPEC.md`](docs/WEB-REDESIGN-SPEC.md) 和 `D:\Ai-Project\Obsidian\DBL_obsidian\会话上下文\设计prompt.md`。
+- 原实现基线：[`docs/design-audit/01-desktop-editor.png`](docs/design-audit/01-desktop-editor.png) 等旧版 52/48 “编辑器 + 小海报”截图。
+- 最终截图方式：Codex 内置浏览器，原生 1440×900 与 390×844 视口；截图后再用 `view_image` 原尺寸复核。
+- 本次截图本地证据目录：`C:\Users\Administrator\AppData\Local\Temp\the-sky-then-final\`。
+- 最终截图：`desktop-landing.png`、`desktop-explore.png`、`mobile-landing.png`、`desktop-paris-selected.png`。
 
-## 已修复
+## 三套方向评估与选择
 
-- 外部展示字体会使 `html-to-image` 在部分浏览器环境中抓取跨域字体而阻塞 PNG 导出；导出海报为 SVG，因此明确跳过字体嵌入，恢复稳定下载。
+1. **Poster Workbench**：旧截图中的 52/48 编辑器与黑色海报，功能清楚但星空尺度太小，淘汰。
+2. **Cinematic SVG Sky**：Ralph 第一/二轮的全屏 SVG 星空与边缘控制，方向正确但星点缺少 GPU 辉光、拾取和视差，作为静态降级保留。
+3. **The Living Sky（选中）**：Worker + Three.js Shader 全屏星空，地点入口保持 52/48，观星后近 100% 舞台；最终实现与本次截图对应。
 
-## 证据与测试
+用户已授权“自行研究什么方案最好”，因此选择第三套作为交付方向，并将第二套收敛为无 WebGL / PNG 导出的可靠降级管线。
 
-- `npm run check`：通过。
-- `npm test`：9 项通过。
-- `npm run web:export`：通过。
-- `npm run test:e2e`：8 项通过；覆盖桌面、平板、移动端、视频存在性、比例、无溢出、主题、PNG、错误恢复、重置、Paris 与付费意向。
+## 视觉对照台账
 
-## 最终结果
+| 比较点 | 设计要求 | 最终实现 | 结论 |
+| --- | --- | --- | --- |
+| 首屏主体 | 星空覆盖至少 65%，不能被海报卡裁切 | 视频、GPU 星点与星座线跨越全视口 | 通过 |
+| 52/48 节奏 | 左侧叙事、右侧轻量入口 | 左侧电影标题约 52%，右侧玻璃输入约 48% | 通过 |
+| 字体 | Poppins + Source Serif 4 斜体强调 | UI / 标题分工符合规范，移动端无孤行 | 通过 |
+| 灰阶与玻璃 | 严格灰阶、两级液态玻璃 | 无装饰性色；玻璃只承载输入和边缘控制 | 通过 |
+| `THE NIGHT WE MET` | 不再常驻黑色卡片 | 作为星空中的电影字幕；正式构图只在作品模式出现 | 通过 |
+| 图标 | Lucide，统一 hover / focus / active | 搜索、下载、聚焦、图层、恢复等均为 Lucide | 通过 |
+| 星空细节 | 星等、辉光、动态与点选 | Shader 点云、加法辉光、独立闪烁、指针视差、亮星详情 | 通过 |
+| 响应式 | 390×844 无溢出，触控目标 ≥44px | 无横向/纵向意外溢出，主要控件触控尺寸达标 | 通过 |
 
-final result: passed
+## 首屏文案差异
+
+- 保留品牌“此刻星空 / THE SKY THEN”、地点/日期/时间、主 CTA“进入这片星空”和隐私提示。
+- 将旧版“让真实星位……”替换为已确认的电影化叙事“回到那一刻，仰望同一片星空。”。
+- 没有增加账号、支付、社区或营销型虚假功能。
+
+## 已修复的可见问题
+
+- 删除初版长表单与右侧小型黑色海报结构。
+- 修复移动端标题末字孤行，并降低移动端星座标签密度。
+- 修复透明观星容器拦截 WebGL 点击，亮星现在可直接点选。
+- 星座线由瞬间出现改为 1.35 秒渐入；指针移动产生轻微相机视差。
+- 无 WebGL 时使用同一真实星图数据渲染静态 SVG，不显示伪造占位星点。
+- Three.js 与 Worker 均异步拆包，首屏 UI 不等待星表或 GPU 模块。
+
+## QA 结论
+
+- 页面身份、非空渲染、错误遮罩、控制台、截图和交互证据均通过。
+- 1440×900、768×1024、390×844 自动化无横向溢出。
+- 最终新浏览器会话控制台 `error / warn` 为 0。
+- Paris 真实查询返回 6 个候选；选择法国 Paris 后时区变为 `Europe/Paris`，星点从 1,327 更新为 1,390。
+- 亮星点选验证到 Arcturus（HIP 69673），详情展示星等、高度角、方位角和带“约”标记的温度估算。
+
+实现已按确认设计忠实验收；没有剩余需要设计评审修正的可见偏差。

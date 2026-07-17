@@ -7,13 +7,55 @@ import starData from '@/data/stars.6.json';
 import type { ProjectedLabel, ProjectedLine, ProjectedStar, SkyInput, SkyMap } from '@/core/types';
 
 type Coordinate = [number, number];
-type StarFeature = { id: string | number; properties: { mag: number }; geometry: { coordinates: Coordinate } };
+type StarFeature = { id: string | number; properties: { mag: number; bv?: string | number }; geometry: { coordinates: Coordinate } };
 type LineFeature = { id: string; geometry: { coordinates: Coordinate[][] } };
 type LabelFeature = { id: string; properties: { desig: string; rank?: string | number }; geometry: { coordinates: Coordinate } };
 
 const stars = (starData as unknown as { features: StarFeature[] }).features.filter((star) => Number(star.properties.mag) <= 5.5);
 const constellationLines = (constellationLineData as unknown as { features: LineFeature[] }).features;
 const constellationLabels = (constellationData as unknown as { features: LabelFeature[] }).features;
+
+const PROPER_STAR_NAMES: Record<number, string> = {
+  7588: 'Achernar',
+  11767: 'Polaris',
+  21421: 'Aldebaran',
+  24436: 'Rigel',
+  24608: 'Capella',
+  27989: 'Betelgeuse',
+  30438: 'Canopus',
+  32349: 'Sirius',
+  37279: 'Procyon',
+  37826: 'Pollux',
+  49669: 'Regulus',
+  60718: 'Acrux',
+  62434: 'Mimosa',
+  65474: 'Spica',
+  68702: 'Hadar',
+  69673: 'Arcturus',
+  71683: 'Rigil Kentaurus',
+  80763: 'Antares',
+  91262: 'Vega',
+  97649: 'Altair',
+  102098: 'Deneb',
+  113368: 'Fomalhaut',
+};
+
+export function estimateStellarTemperature(colorIndex: number | null) {
+  if (colorIndex === null || !Number.isFinite(colorIndex)) return null;
+  const temperature = 4600 * ((1 / (0.92 * colorIndex + 1.7)) + (1 / (0.92 * colorIndex + 0.62)));
+  return Math.round(Math.min(40000, Math.max(2500, temperature)) / 50) * 50;
+}
+
+export function estimateSpectralClass(temperature: number | null) {
+  if (temperature === null) return null;
+  if (temperature >= 30000) return 'O';
+  if (temperature >= 10000) return 'B';
+  if (temperature >= 7500) return 'A';
+  if (temperature >= 6000) return 'F';
+  if (temperature >= 5200) return 'G';
+  if (temperature >= 3700) return 'K';
+  return 'M';
+}
 
 function projectCoordinate(
   coordinate: Coordinate,
@@ -50,15 +92,24 @@ export function buildSkyMap(input: SkyInput): SkyMap {
   for (const star of stars) {
     const point = projectCoordinate(star.geometry.coordinates, utcDate, rotation);
     if (point.altitude >= 0) {
+      const hip = Number(star.id);
+      const parsedColorIndex = Number(star.properties.bv);
+      const colorIndex = Number.isFinite(parsedColorIndex) ? parsedColorIndex : null;
+      const temperature = estimateStellarTemperature(colorIndex);
       projectedStars.push({
-        id: `hip-${star.id}`,
+        id: `hip-${hip}`,
+        hip,
+        name: PROPER_STAR_NAMES[hip],
         x: point.x,
         y: point.y,
         altitude: point.altitude,
         azimuth: point.azimuth,
         magnitude: Number(star.properties.mag),
+        colorIndex,
+        temperature,
+        spectralClass: estimateSpectralClass(temperature),
         opacity: Math.max(0.3, Math.min(1, point.altitude / 18)),
-        twinkleSeed: Number(star.id) % 997,
+        twinkleSeed: hip % 997,
       });
     }
   }

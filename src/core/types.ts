@@ -21,11 +21,16 @@ export type SkyInput = {
 
 export type ProjectedStar = {
   id: string;
+  hip: number;
+  name?: string;
   x: number;
   y: number;
   altitude: number;
   azimuth: number;
   magnitude: number;
+  colorIndex: number | null;
+  temperature: number | null;
+  spectralClass: string | null;
   opacity: number;
   twinkleSeed: number;
 };

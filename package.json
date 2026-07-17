@@ -7,13 +7,17 @@
     "astronomy-engine": "^2.1.19",
     "date-fns-tz": "^3.2.0",
     "html-to-image": "^1.11.13",
+    "lucide-react": "^1.25.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "three": "^0.185.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.1",
     "@types/react": "~19.2.2",
+    "@types/three": "^0.185.1",
     "@vercel/node": "^5.8.23",
     "eslint": "^9.0.0",
     "sharp": "^0.35.3",

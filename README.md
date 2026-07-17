@@ -1,16 +1,26 @@
 # 此刻星空 / The Sky Then
 
-输入日期、当地时间和地点，生成那一刻当地真实可见星空的纪念海报。
+输入日期、当地时间与地点，在浏览器中重现那一刻真实可见的星空，并生成可下载的纪念作品。
 
-当前版本提供三套设计、三种画幅、星座连线与名称、本地设置恢复、免费 PNG 导出，以及“印刷级 4K 数字版”的非扣款付费意愿验证。真实支付尚未开放。
+## 当前架构
 
-## 平台
+- Web：Vite + React + TypeScript，部署到 Vercel。
+- 地点：`GET /api/geocode?q=Paris` 仅返回标准化城市、坐标与 IANA 时区。
+- 计算：`astronomy-engine` 在 Web Worker 中完成赤道坐标到地平坐标的转换，主线程保持响应。
+- 渲染：Three.js `Points + ShaderMaterial` 交给浏览器 GPU 绘制星等、辉光、闪烁、星座线、视差与点选；无 WebGL 时退化为静态 SVG。
+- 导出：独立 SVG 作品画布经 `html-to-image` 输出 PNG，不截取背景视频。
+- 隐私：日期、地点、坐标、标题和题词不上传；服务器不生成星图。
 
-- Web：Expo 静态导出，Vercel 部署。
-- iOS / Android：Expo + EAS Build。
-- 轻后端：Vercel Function 代理并缓存地理编码请求。
+## 体验
 
-## 开发
+- 全屏灰阶星空视频与 1,300+ 颗本地计算恒星叠加。
+- 52/48 首屏节奏、两级液态玻璃、Poppins / Source Serif 4、Lucide 图标。
+- 观星模式支持时间轴、恢复原时刻、星座线/名称、星座聚焦和亮星详情。
+- 恒星详情包含 HIP 编号、视星等、高度角、方位角、B−V 推算温度与光谱分类。
+- 独立作品模式支持直接编辑标题/题词和免费 PNG 下载。
+- 桌面、平板、移动端响应式；支持键盘焦点、`prefers-reduced-motion` 和视频关闭。
+
+## 本地开发
 
 ```bash
 npm install
@@ -21,39 +31,12 @@ npm run web:export
 npm run test:e2e
 ```
 
-环境变量：
+无需 API Key。同源 `/api/geocode` 不可用时，客户端地点服务会按既有规则降级；已有星图计算与作品导出不依赖远程视频。
 
-```text
-EXPO_PUBLIC_API_BASE_URL=https://your-production-domain.vercel.app
-```
+## 文档
 
-未设置时，Web 先请求同源 `/api/geocode`，原生端直接使用 Open-Meteo。
-
-Playwright 会自行导出 Web 并启动一次性静态服务器，不需要手工常驻开发服务。
-
-## 匿名事件
-
-- Web：通过 Vercel Analytics 记录 `poster_generated`、`poster_downloaded`、`premium_intent_clicked`。
-- iOS/Android：只在设备本地累计对应计数，不上传。
-- 属性只有主题和画幅枚举，不包含日期、时间、地点、坐标、标题或题词。
-- “¥19.9 买断”当前只是价格意愿实验，点击不会扣款或创建订单。
-
-## 构建
-
-```bash
-npx eas-cli@latest build --platform android --profile preview
-npx eas-cli@latest build --platform ios --profile preview
-```
-
-iOS 本地签名需要 macOS/Xcode；Windows 使用 EAS 云构建。
-
-当前 iOS/Android 共享代码和 bundle 可导出；签名安装包、TestFlight 和 Google Play 内测仍需要 Expo/EAS 与商店凭据。
-
-## 数据
-
-数据、许可证和隐私边界见 `docs/DATA-SOURCES.md` 与 `docs/PRIVACY.md`。
-# 前端体验升级
-
-Web 工作台现在采用沉浸式星空视频背景与深色液态玻璃界面：桌面端为左侧编辑、右侧预览的 52/48 分栏；移动端按预览优先的任务顺序排列。Web 背景视频静音自动循环播放，无法加载时使用稳定的深色背景，原生端不依赖该视频。关键控件具备悬停、焦点与按下反馈，并尊重系统“减少动态效果”偏好。
-
-改版的视口与可访问性审查记录见 [design-qa.md](design-qa.md)。
+- 产品与视觉规范：[`docs/WEB-REDESIGN-SPEC.md`](docs/WEB-REDESIGN-SPEC.md)
+- 数据来源与许可：[`docs/DATA-SOURCES.md`](docs/DATA-SOURCES.md)
+- 隐私边界：[`docs/PRIVACY.md`](docs/PRIVACY.md)
+- 最终设计 QA：[`design-qa.md`](design-qa.md)
+- 体验审计：[`docs/design-audit/AUDIT.md`](docs/design-audit/AUDIT.md)
