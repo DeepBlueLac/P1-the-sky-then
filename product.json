@@ -1,17 +1,14 @@
-﻿{
-    "slug":  "the-sky-then",
-    "name":  "此刻星空",
-    "mode":  "light-api",
-    "status":  "Web 已上线",
-    "platforms":  [
-                      "web",
-                      "ios",
-                      "android"
-                  ],
-    "path":  "C:\\Users\\Administrator\\Documents\\变成一个网站并部署\\products\\the-sky-then",
-    "github":  "https://github.com/DeepBlueLac/the-sky-then",
-    "webUrl":  "https://the-sky-then-live.vercel.app",
-    "bundleId":  "com.deepbluelac.theskythen",
-    "createdAt":  "2026-07-12T11:35:51.9047248Z",
-    "updatedAt":  "2026-07-12T16:02:00.0000000Z"
+{
+  "slug": "the-sky-then",
+  "name": "此刻星空",
+  "mode": "light-api",
+  "status": "Web 已上线",
+  "platforms": [
+    "web"
+  ],
+  "path": "C:\\Users\\Administrator\\Documents\\变成一个网站并部署\\products\\P1-the-sky-then",
+  "github": "https://github.com/DeepBlueLac/the-sky-then",
+  "webUrl": "https://the-sky-then-live.vercel.app",
+  "createdAt": "2026-07-12T11:35:51.9047248Z",
+  "updatedAt": "2026-07-18T04:45:00.0000000Z"
 }

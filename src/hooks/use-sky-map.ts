@@ -35,7 +35,7 @@ export function useSkyMap(input: SkyInput) {
     requestRef.current = requestId;
     setState('calculating');
     workerRef.current.postMessage({ requestId, input });
-  }, [input.date, input.latitude, input.longitude, input.time, input.timezone]);
+  }, [input]);
 
   return { sky, state };
 }

@@ -85,7 +85,10 @@ export default function SkyStage({ sky, showLines, focusedConstellation, immersi
   const hostRef = useRef<HTMLDivElement>(null);
   const [webglUnavailable, setWebglUnavailable] = useState(false);
   const selectedHandlerRef = useRef(onSelectStar);
-  selectedHandlerRef.current = onSelectStar;
+
+  useEffect(() => {
+    selectedHandlerRef.current = onSelectStar;
+  }, [onSelectStar]);
 
   useEffect(() => {
     const host = hostRef.current;
