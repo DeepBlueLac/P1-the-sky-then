@@ -48,6 +48,8 @@ button:focus-visible, input:focus-visible, a:focus-visible, [contenteditable="tr
 .brand-mark { align-items: center; background: rgba(255,255,255,.1); border-radius: 50%; display: flex; height: 36px; justify-content: center; position: relative; width: 36px; }
 .brand-mark::after { border-radius: inherit; box-shadow: 0 0 25px rgba(255,255,255,.28); content: ''; inset: 0; position: absolute; }
 .site-header nav { align-items: center; display: flex; gap: 22px; }
+.site-header nav > .site-link { align-items: center; color: var(--white-60); display: inline-flex; font-size: 10px; font-weight: 700; letter-spacing: .08em; min-height: 44px; text-decoration: none; text-transform: uppercase; transition: color 180ms ease; }
+.site-header nav > .site-link:hover { color: white; }
 .site-header nav > button { align-items: center; background: transparent; border: 0; color: var(--white-80); display: inline-flex; font-size: 11px; gap: 7px; min-height: 44px; padding: 0; transition: color 180ms ease, transform 180ms ease; }
 .site-header nav > button:hover { color: white; transform: translateY(-1px); }
 .site-header nav > button:active { transform: scale(.96); }
@@ -190,6 +192,7 @@ button:focus-visible, input:focus-visible, a:focus-visible, [contenteditable="tr
 @media (max-width: 600px) {
   .site-header { left: 18px; right: 18px; top: 17px; }
   .site-header nav > button:not(.menu-button) { display: none; }
+  .site-header nav > .site-link { display: none; }
   .landing { gap: 30px; padding: 104px 18px 104px; }
   .hero-intro { font-size: 8px; margin-bottom: 18px; }
   .hero-copy h1 { font-size: clamp(40px, 11vw, 52px); line-height: .98; }

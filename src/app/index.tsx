@@ -161,6 +161,8 @@ export default function SkyExperience() {
     <header className="site-header">
       <a className="brand" href="#top" aria-label="此刻星空首页"><span className="brand-mark"><Sparkles size={16} /></span><span>此刻星空 <small>THE SKY THEN</small></span></a>
       <nav aria-label="主导航">
+        <a className="site-link" href="/historical-night-sky/">任务指南</a>
+        <a className="site-link" href="https://bulidoge.site/products/the-sky-then">DBL-TOOLS</a>
         <button type="button" onClick={() => setPosterMode(true)}><Download size={15} /> 作品模式</button>
         <button type="button" onClick={() => setShowInfo((value) => !value)}><CircleHelp size={15} /> 关于数据</button>
         <button className="menu-button liquid-glass" type="button" onClick={() => setShowVideo((value) => !value)} aria-label={showVideo ? '关闭环境视频' : '开启环境视频'} aria-pressed={showVideo}>{showVideo ? <Menu size={16} /> : <Minus size={16} />}</button>
